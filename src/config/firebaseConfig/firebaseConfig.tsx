@@ -1,9 +1,8 @@
 // Import the functions you need from the SDKs you need
-import envVar from "@/constants/env/envVar";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -26,3 +25,5 @@ export const firestoreDb = getFirestore(firebaseApp);
 export const firebaseRealTimeDb = getDatabase(firebaseApp);
 // auth
 export const firebaseAuth = getAuth(firebaseApp);
+// google
+export const googleSignInProvider = new GoogleAuthProvider();

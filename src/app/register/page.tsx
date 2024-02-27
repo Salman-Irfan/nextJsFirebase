@@ -1,14 +1,15 @@
 "use client"
 import { firebaseAuth } from '@/config/firebaseConfig/firebaseConfig'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import React, { useState } from 'react'
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithPopup, onAuthStateChanged } from 'firebase/auth'
+import React, { useEffect, useState } from 'react'
 
 const SignUpPage = () => {
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const [user, setUser] = useState(false)
     // Function to sign up user
-    const handleSignUpUser = async (e:any  ) => {
+    const handleSignUpUser = async (e: any) => {
         e.preventDefault()
         try {
             const response = await createUserWithEmailAndPassword(
@@ -21,6 +22,31 @@ const SignUpPage = () => {
             console.log(error)
         }
     }
+    // sign in with google
+    const googleProvider = new GoogleAuthProvider()
+
+    const handleSignInWithGoogle = async () => {
+        try {
+            const response = await signInWithPopup(firebaseAuth, googleProvider)
+            console.log(response)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // getting sign in or sign out state
+    useEffect(() => {
+        onAuthStateChanged(firebaseAuth, (user)=>{
+            if(user){
+                console.log(`you are logged in`)
+                console.log(user)
+            }else{
+                console.log(`you are logged out`)
+            }
+        })
+
+    }, [])
+
 
     return (
         <>
@@ -57,6 +83,15 @@ const SignUpPage = () => {
                             </button>
                         </div>
                     </form>
+                    {/* sign in google */}
+                    <div className="flex justify-center">
+                        <button
+                            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                            onClick={handleSignInWithGoogle}
+                        >
+                            Sign In with Google
+                        </button>
+                    </div>
                 </div>
             </div>
         </>
