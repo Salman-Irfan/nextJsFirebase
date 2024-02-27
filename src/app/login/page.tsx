@@ -1,6 +1,6 @@
 "use client"
 import { firebaseAuth } from '@/config/firebaseConfig/firebaseConfig'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword  } from 'firebase/auth'
 import React, { useState } from 'react'
 
 const SignUpPage = () => {
@@ -8,10 +8,10 @@ const SignUpPage = () => {
     const [password, setPassword] = useState('');
 
     // Function to sign up user
-    const handleSignUpUser = async (e:any  ) => {
+    const handleLoginUser = async (e: any) => {
         e.preventDefault()
         try {
-            const response = await createUserWithEmailAndPassword(
+            const response = await signInWithEmailAndPassword (
                 firebaseAuth,
                 email,
                 password
@@ -26,8 +26,8 @@ const SignUpPage = () => {
         <>
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
                 <div className="max-w-md w-full space-y-8 p-8 rounded-lg shadow-lg bg-gradient-to-r from-blue-900 to-gray-900">
-                    <h2 className="text-3xl font-bold text-white text-center">Sign Up</h2>
-                    <form className="mt-8 space-y-6" onSubmit={handleSignUpUser}>
+                    <h2 className="text-3xl font-bold text-white text-center">Login</h2>
+                    <form className="mt-8 space-y-6" onSubmit={handleLoginUser}>
                         <div>
                             <input
                                 type="email"
@@ -51,9 +51,9 @@ const SignUpPage = () => {
                         <div>
                             <button
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-900 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                                className="w-full bg-gradient-to-r from-green-500 to-green-700 hover:bg-gradient-to-r hover:from-green-700 hover:to-green-900 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
                             >
-                                Sign Up
+                                Login
                             </button>
                         </div>
                     </form>
