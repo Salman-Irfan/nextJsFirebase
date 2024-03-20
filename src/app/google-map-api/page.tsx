@@ -1,6 +1,6 @@
 "use client"
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
-import React, { useEffect, useState, useRef } from 'react'
+import { Autocomplete, DirectionsRenderer, GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
+import React, { useEffect, useState, useRef, MutableRefObject } from 'react'
 
 const initialCenter = {
     lat: 31.4805,
@@ -22,7 +22,15 @@ const page = () => {
     const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API || '';
     const [currentPosition, setCurrentPosition] = useState<Position | null>(null); // Specify the type
     const [originalCenter, setOriginalCenter] = useState(initialCenter);
+    const [directionResponse, setDirectionResponse] = useState<any>(null);
+    const [distance, setDistance] = useState<any>("");
+    const [duration, setDuration] = useState<any>("");
+
     const mapRef = useRef<google.maps.Map | null>(null); // Define the type for mapRef
+
+    const originRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
+    const destinationRef: MutableRefObject<HTMLInputElement | null> = useRef(null);
+
 
     useEffect(() => {
         // Fetch current geolocation
@@ -43,7 +51,8 @@ const page = () => {
     }, [currentPosition]); // Include currentPosition as a dependency
 
     const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: googleMapsApiKey
+        googleMapsApiKey: googleMapsApiKey,
+        libraries: ['places']
     })
 
     const handleReCenter = () => {
@@ -62,10 +71,77 @@ const page = () => {
         )
     }
 
+    // function to calculate route
+    const handleCalculateRoute = async () => {
+        // Get the values from input fields
+        const originValue = originRef.current?.value;
+        const destinationValue = destinationRef.current?.value;
+
+        // Check if either origin or destination is empty
+        if (!originValue || !destinationValue) {
+            return;
+        }
+
+        const directionService = new google.maps.DirectionsService();
+        const result = await directionService.route({
+            origin: originValue,
+            destination: destinationValue,
+            travelMode: google.maps.TravelMode.DRIVING
+        });
+        console.log(result)
+        // set direction response
+        setDirectionResponse(result);
+        setDistance(result.routes[0].legs[0].distance?.text)
+        setDuration(result.routes[0].legs[0].duration?.text)
+    };
+
     return (
         <>
             <div>
                 Google Maps Api
+                {/* source */}
+                <Autocomplete>
+                    <>
+                        {/* increase the width of this input box */}
+                        <label htmlFor="source">Source: </label>
+                        <input
+                            type="text"
+                            name="source"
+                            id="source"
+                            placeholder='Source'
+                            ref={originRef}
+                            style={{ width: '100%' }} // Adjust width as needed
+                        />
+                    </>
+                </Autocomplete>
+                {/* destination */}
+                <Autocomplete>
+                    <>
+                        <label htmlFor="destination">Destination: </label>
+                        <input
+                            type="text"
+                            name="destination"
+                            id="destination"
+                            placeholder='Destination'
+                            ref={destinationRef}
+                            style={{ width: '100%' }} // Adjust width as needed
+                        />
+                    </>
+                </Autocomplete>
+                {/* calculate route */}
+                <button
+                    type="button"
+                    className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    onClick={handleCalculateRoute}
+                >
+                    Calculate Route
+                </button>
+                {distance &&
+                    <>
+                        <p>Distance: {distance}</p>
+                        <p>Duration: {duration}</p>
+                    </>
+                }
                 {/* Re-center button */}
                 <button
                     type="button"
@@ -74,6 +150,7 @@ const page = () => {
                 >
                     Re Center
                 </button>
+
                 {/* Google map box */}
                 <GoogleMap
                     center={initialCenter}
@@ -92,6 +169,8 @@ const page = () => {
                     <Marker position={astp} />
                     {/* Add marker for current geolocation */}
                     {currentPosition && <Marker position={currentPosition} />}
+                    {/* direction renderers */}
+                    {directionResponse && <DirectionsRenderer directions={directionResponse} />}
                 </GoogleMap>
             </div>
         </>

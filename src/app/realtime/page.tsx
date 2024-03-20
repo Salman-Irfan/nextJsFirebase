@@ -5,9 +5,6 @@ import React from 'react'
 
 const page = () => {
 
-    const {DATABASE_URL} = process.env
-    console.log(DATABASE_URL)
-
     return (
         <>
             <div>page</div>
